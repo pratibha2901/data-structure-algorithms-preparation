@@ -1,39 +1,66 @@
-var findSubstring = function(s, words) {
-    let winStrt = 0;
-    let k = words[0].length;
-    let winEnd = k;
-    let found = 0;
-    let res = [];
-    let setOfWords = {};
-    for (let word of words){
-        setOfWords[word] = (setOfWords[word]||0)+1;
-    }
-    let foundWords = {};
-    while(winStrt < s.length && winEnd < s.length){
-        let currSubstr = s.substring(winEnd-k,winEnd);
-        foundWords[currSubstr] = (foundWords[currSubstr] || 0) +1;
-        if(found > 0 && (!(currSubstr in setOfWords) || (setOfWords[currSubstr] > foundWords[currSubstr]))){
-            found = 0;
-            foundWords = {};
-            winStrt+=k;
-        }
-        else if((currSubstr in setOfWords) && (setOfWords[currSubstr] === foundWords[currSubstr])){
-          found +=1;
-         
-        }else{
-            winStrt+=k;
-        }
-        if(found === words.length){
-          res.push(winStrt);
-          found = 0;
-          foundWords = {};
-          winStrt=winEnd;
-        }
-         
-          winEnd+=k;
-        
-       
+var findSubstring = function (s, words) {
+    if(s === words.join('').toString('')){
+       return [0];
+   }
+   let winStrt = 0;
+   let k = words[0].length;
+
+  
+   let res = [];
+   let mapOfWords = {};
+  setOfWords = new Set(words);
+  if(setOfWords.size === 1){
+       let setItr = setOfWords.keys();
+      mapOfWords[setItr.next().value] = words.length;
+   }else {
+       for (let word of words) {
+           mapOfWords[word] = (mapOfWords[word] || 0) + 1;
+       }
+   }
+   let setOfS = new Set(s);
+   let iter = setOfS.keys();
+   let key = (iter.next().value);
+   if(setOfS.size === 1 && (key in mapOfWords) && Object.keys(mapOfWords).length === 1){
+    let winStr = 0;
+    while(winStrt < s.length){
+       let substr = s.substring(winStrt,s.length);
+       if(substr.length>= mapOfWords[key] ){
+           res.push(winStrt);
+           
+       }
+       winStrt += mapOfWords[key];
     }
     return res;
- }
- findSubstring(s = "barfoothefoobarman", words = ["foo","bar"])
+   }
+
+  
+   while (winStrt < s.length) {
+       //start evaluating with this starting position
+       winEnd = winStrt;
+       let foundWords = {};
+       let found = 0;
+       while (winEnd < s.length && found < Object.keys(mapOfWords).length) {
+           currentWord = s.substring(winEnd, winEnd + k);
+           foundWords[currentWord] = (foundWords[currentWord]||0)+1;
+           if ((currentWord in mapOfWords) && (mapOfWords[currentWord] === foundWords[currentWord])) {
+             found += 1;
+           }
+           else if (((currentWord in mapOfWords) && (mapOfWords[currentWord] < foundWords[currentWord]))||
+           (!(currentWord in mapOfWords))){
+             found = 0;
+             foundWords = {};
+             break;
+           }
+           winEnd += k;
+       }
+       if(found === Object.keys(mapOfWords).length){
+           res.push(winStrt);
+       }
+       winStrt += 1;
+   }
+   return res;
+}
+ findSubstring( s =
+    "aaa",
+    words =
+    ["a","a"]);
