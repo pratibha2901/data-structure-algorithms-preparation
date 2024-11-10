@@ -1,46 +1,59 @@
-class Dequeue{
-  constructor(nums){
-      this.nums = nums;
-      this.queue = [];
-  }
-  isEmpty(){
-       (this.queue.length > 0)?false:true;
-  }
-  peek(){
-      return this.queue[this.queue.length -1]
-  }
-  insert(item){
-      while(!this.isEmpty() && this.nums[item] >= this.nums[this.peek()]){
-          this.queue.pop();
-          }
-          this.queue.push(item);
+class Dequeue {
+    constructor(nums){
+        this.queue = [];
+        this.nums = nums
+    }
+    insert(index){
+      let currEle = this.nums[index];
+      let topElement = this.nums[this.queue[this.queue.length -1]];
+      while(!this.isEmpty() && currEle >= topElement){
+        // pop the last element
+        this.queue.pop();
+        topElement = this.nums[this.queue[this.queue.length -1]];
       }
-  
-  popLeft(){
-     return this.queue.shift();
-  }
+      this.queue.push(index);
+    }
+    popLeft(){
+        // pop first element of queue
+       return this.queue.shift();
+    }
+    currentMax(){
+       return this.nums[this.queue[0]];
+    }
+    isEmpty(){
+        return (this.queue.length === 0);
+    }
+    checkOverflow(currentIndex,k){
+      let topIndex = this.queue[0];
+      if(topIndex === (currentIndex - k)){
+        this.popLeft();
+      }
+    }
 }
-  
 var maxSlidingWindow = function(nums, k) {
-  let ans = [];
- let dequeue = new Dequeue(nums);
- let i = 0;
- while(i < k){
-   dequeue.insert(i);
-   i++;
- }
- ans.push(nums[dequeue.queue[0]]);
- while(i < nums.length){
-  if(!(dequeue.isEmpty()) && dequeue.queue[0] === (i-k)){
-      dequeue.popLeft();
-  }
-  dequeue.insert(i);
-  ans.push(nums[dequeue.queue[0]]);
-  i++;
- }
- return ans;
-};
+    let dequeue = new Dequeue(nums);
+    let ans = [];
+    let i = 0;
+    while(i < k){
+        dequeue.insert(i);
+        i++;
+    }
+    // now the top element is the first max element of first k window
+    ans.push(dequeue.currentMax());
+    while(i < nums.length){
+        // the queue must not contain more than k element
+        if(!dequeue.isEmpty()){
+            dequeue.checkOverflow(i,k);
+        }
+        dequeue.insert(i);
+        ans.push(dequeue.currentMax());
+        i++;
+    }
+    return ans;
+
+
+}
 maxSlidingWindow(nums =
-    [1,3,-1,-3,5,3,6,7],
+    [1,-1],
     k =
-    3);
+    1);
